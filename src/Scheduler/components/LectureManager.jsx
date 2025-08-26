@@ -44,7 +44,9 @@ const LectureManager = ({ lectures, onLecturesChange }) => {
               border: '1px solid #444',
               background: '#2a2a2a',
               color: '#e5e5e5',
-              minHeight: '36px'
+              minHeight: '36px',
+              width: '100%',
+              boxSizing: 'border-box'
             }} 
           />
           <input 
@@ -58,7 +60,9 @@ const LectureManager = ({ lectures, onLecturesChange }) => {
               border: '1px solid #444',
               background: '#2a2a2a',
               color: '#e5e5e5',
-              minHeight: '36px'
+              minHeight: '36px',
+              width: '100%',
+              boxSizing: 'border-box'
             }} 
           />
         </div>
