@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { generateSchedule } from "./services/scheduleService";
 import LectureManager from "./components/LectureManager";
 import ScheduleDisplay from "./components/ScheduleDisplay";
@@ -13,6 +13,7 @@ const Scheduler = () => {
   const [lectures, setLectures] = useState([]);
   const [uniDone, setUniDone] = useState(false);
   const [schedule, setSchedule] = useState([]);
+  const [navLocked, setNavLocked] = useState(false);
 
   const handleLecturesChange = (newLectures) => {
     setLectures(newLectures);
@@ -33,16 +34,23 @@ const Scheduler = () => {
   };
 
   const changeDay = (deltaDays) => {
-    const next = new Date(currentDate);
-    next.setDate(next.getDate() + deltaDays);
-    setCurrentDate(next);
-    // Regenerate if a schedule is already displayed
+    if (navLocked) return;
+    setNavLocked(true);
+    setCurrentDate((prev) => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() + deltaDays);
+      return next;
+    });
+    window.setTimeout(() => setNavLocked(false), 180);
+  };
+
+  useEffect(() => {
     if (schedule && schedule.length) {
-      const nextDay = weekdays[next.getDay()];
-      const newSchedule = generateSchedule(nextDay, lectures, uniDone);
+      const newSchedule = generateSchedule(weekdays[currentDate.getDay()], lectures, uniDone);
       setSchedule(newSchedule);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentDate]);
 
   return (
     <div style={{ 
@@ -72,18 +80,19 @@ const Scheduler = () => {
       }}>
         <button 
           onClick={() => changeDay(-1)}
+          disabled={navLocked}
           style={{
             padding: '6px 10px',
             fontSize: '14px',
             fontWeight: 600,
             borderRadius: '6px',
             border: '1px solid #334155',
-            background: '#0f172a',
-            color: '#cbd5e1',
-            cursor: 'pointer'
+            background: navLocked ? '#0b1323' : '#0f172a',
+            color: navLocked ? '#64748b' : '#cbd5e1',
+            cursor: navLocked ? 'not-allowed' : 'pointer'
           }}
-          onMouseEnter={(e) => e.target.style.background = '#111827'}
-          onMouseLeave={(e) => e.target.style.background = '#0f172a'}
+          onMouseEnter={(e) => !navLocked && (e.target.style.background = '#111827')}
+          onMouseLeave={(e) => !navLocked && (e.target.style.background = '#0f172a')}
         >
           {'<<'}
         </button>
@@ -98,18 +107,19 @@ const Scheduler = () => {
 
         <button 
           onClick={() => changeDay(1)}
+          disabled={navLocked}
           style={{
             padding: '6px 10px',
             fontSize: '14px',
             fontWeight: 600,
             borderRadius: '6px',
             border: '1px solid #334155',
-            background: '#0f172a',
-            color: '#cbd5e1',
-            cursor: 'pointer'
+            background: navLocked ? '#0b1323' : '#0f172a',
+            color: navLocked ? '#64748b' : '#cbd5e1',
+            cursor: navLocked ? 'not-allowed' : 'pointer'
           }}
-          onMouseEnter={(e) => e.target.style.background = '#111827'}
-          onMouseLeave={(e) => e.target.style.background = '#0f172a'}
+          onMouseEnter={(e) => !navLocked && (e.target.style.background = '#111827')}
+          onMouseLeave={(e) => !navLocked && (e.target.style.background = '#0f172a')}
         >
           {'>>'}
         </button>

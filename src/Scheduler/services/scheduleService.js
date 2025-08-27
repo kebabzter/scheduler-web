@@ -18,6 +18,8 @@ const mergeBlocks = (blocks) => {
   return merged;
 };
 
+const minutesBetween = (start, end) => timeToMinutes(end) - timeToMinutes(start);
+
 const addMorningRoutine = (blocks) => {
   blocks.push(
     { start: { hour: 7, minute: 30 }, end: { hour: 7, minute: 45 }, task: "Wake up & morning routine" },
@@ -106,6 +108,37 @@ const addNonWorkDaySchedule = (blocks, current, uniDone) => {
   );
 };
 
+const insertCleaningSunday = (blocks) => {
+  const cutoff = { hour: 20, minute: 0 };
+  const isBeforeCutoff = (t) => timeToMinutes(t) < timeToMinutes(cutoff);
+  const canUseTask = (task) => task === "Relax" || task === "Math study" || task === "Uni work";
+
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    if (!canUseTask(b.task)) continue;
+    if (!isBeforeCutoff(b.start)) continue;
+
+    const blockEndBeforeCutoff = timeToMinutes(b.end) <= timeToMinutes(cutoff) ? b.end : cutoff;
+    const available = minutesBetween(b.start, blockEndBeforeCutoff);
+    if (available >= 60) {
+      const cleaningStart = b.start;
+      const cleaningEnd = addMinutes(cleaningStart, 60);
+
+      const newBlocks = [];
+      // Prefix (none because we start at b.start)
+      newBlocks.push({ start: cleaningStart, end: cleaningEnd, task: "Cleaning" });
+      // Suffix remainder of original block
+      if (timeToMinutes(cleaningEnd) < timeToMinutes(b.end)) {
+        newBlocks.push({ start: cleaningEnd, end: b.end, task: b.task });
+      }
+
+      // Replace current block with new ones
+      blocks.splice(i, 1, ...newBlocks);
+      return; // only insert once
+    }
+  }
+};
+
 export const generateSchedule = (day, lectures, uniDone) => {
   const WORK_DAYS = ["Mon", "Tue", "Thu", "Fri"];
   let blocks = [];
@@ -127,6 +160,11 @@ export const generateSchedule = (day, lectures, uniDone) => {
     addWorkDaySchedule(blocks, current);
   } else {
     addNonWorkDaySchedule(blocks, current, uniDone);
+  }
+
+  // Sunday cleaning: insert earliest 60-min window before 20:00
+  if (day === "Sun") {
+    insertCleaningSunday(blocks);
   }
 
   return mergeBlocks(blocks);
