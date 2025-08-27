@@ -3,6 +3,8 @@ import { generateSchedule } from "./services/scheduleService";
 import LectureManager from "./components/LectureManager";
 import ScheduleDisplay from "./components/ScheduleDisplay";
 import UniWorkToggle from "./components/UniWorkToggle";
+import SettingsButton from "./components/SettingsButton";
+import SettingsModal from "./components/SettingsModal";
 
 const Scheduler = () => {
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -14,6 +16,8 @@ const Scheduler = () => {
   const [uniDone, setUniDone] = useState(false);
   const [schedule, setSchedule] = useState([]);
   const [navLocked, setNavLocked] = useState(false);
+  const [workDays, setWorkDays] = useState(["Mon", "Tue", "Thu", "Fri"]);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleLecturesChange = (newLectures) => {
     setLectures(newLectures);
@@ -24,7 +28,7 @@ const Scheduler = () => {
   };
 
   const handleGenerateSchedule = () => {
-    const newSchedule = generateSchedule(day, lectures, uniDone);
+    const newSchedule = generateSchedule(day, lectures, uniDone, workDays);
     setSchedule(newSchedule);
   };
 
@@ -46,11 +50,11 @@ const Scheduler = () => {
 
   useEffect(() => {
     if (schedule && schedule.length) {
-      const newSchedule = generateSchedule(weekdays[currentDate.getDay()], lectures, uniDone);
+      const newSchedule = generateSchedule(weekdays[currentDate.getDay()], lectures, uniDone, workDays);
       setSchedule(newSchedule);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDate]);
+  }, [currentDate, workDays]);
 
   return (
     <div style={{ 
@@ -61,8 +65,17 @@ const Scheduler = () => {
       borderRadius: 6,
       textAlign: 'left',
       maxWidth: '600px',
-      margin: '0 auto'
+      margin: '0 auto',
+      position: 'relative'
     }}>
+      <SettingsButton onClick={() => setSettingsOpen(true)} />
+      <SettingsModal 
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        workDays={workDays}
+        onSaveWorkDays={setWorkDays}
+      />
+
       <h2 style={{ 
         marginTop: 0, 
         marginBottom: '8px',

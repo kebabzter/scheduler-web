@@ -139,8 +139,8 @@ const insertCleaningSunday = (blocks) => {
   }
 };
 
-export const generateSchedule = (day, lectures, uniDone) => {
-  const WORK_DAYS = ["Mon", "Tue", "Thu", "Fri"];
+export const generateSchedule = (day, lectures, uniDone, workDays = ["Mon", "Tue", "Thu", "Fri"]) => {
+  const WORK_DAYS = workDays;
   let blocks = [];
 
   // Morning routine
