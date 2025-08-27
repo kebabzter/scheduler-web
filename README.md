@@ -1,5 +1,7 @@
 # Info
 
+**disclaimer! This app is 100% vibecoded and the code is probably ASS**
+
 This app is a direct translation of my python cli **[week-scheduler](https://github.com/kebabzter/week-scheduler.git)**
 
 This version is created for the web so that it can be easily accessible on a mobile device.
