@@ -18,6 +18,8 @@ const Scheduler = () => {
   const [navLocked, setNavLocked] = useState(false);
   const [workDays, setWorkDays] = useState(["Mon", "Tue", "Thu", "Fri"]);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [focusGoalLabel, setFocusGoalLabel] = useState("Math study");
+  const [uniWorkLabel, setUniWorkLabel] = useState("Uni work");
 
   const handleLecturesChange = (newLectures) => {
     setLectures(newLectures);
@@ -28,7 +30,7 @@ const Scheduler = () => {
   };
 
   const handleGenerateSchedule = () => {
-    const newSchedule = generateSchedule(day, lectures, uniDone, workDays);
+    const newSchedule = generateSchedule(day, lectures, uniDone, workDays, focusGoalLabel, uniWorkLabel);
     setSchedule(newSchedule);
   };
 
@@ -50,11 +52,18 @@ const Scheduler = () => {
 
   useEffect(() => {
     if (schedule && schedule.length) {
-      const newSchedule = generateSchedule(weekdays[currentDate.getDay()], lectures, uniDone, workDays);
+      const newSchedule = generateSchedule(
+        weekdays[currentDate.getDay()],
+        lectures,
+        uniDone,
+        workDays,
+        focusGoalLabel,
+        uniWorkLabel
+      );
       setSchedule(newSchedule);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDate, workDays]);
+  }, [currentDate, workDays, focusGoalLabel, uniWorkLabel]);
 
   return (
     <div style={{ 
@@ -74,6 +83,9 @@ const Scheduler = () => {
         onClose={() => setSettingsOpen(false)}
         workDays={workDays}
         onSaveWorkDays={setWorkDays}
+        focusGoalLabel={focusGoalLabel}
+        uniWorkLabel={uniWorkLabel}
+        onSaveGoals={(focus, uni) => { setFocusGoalLabel(focus); setUniWorkLabel(uni); }}
       />
 
       <h2 style={{ 

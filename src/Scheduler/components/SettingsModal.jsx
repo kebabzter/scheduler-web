@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const SettingsModal = ({ isOpen, onClose, workDays, onSaveWorkDays }) => {
+const SettingsModal = ({ isOpen, onClose, workDays, onSaveWorkDays, focusGoalLabel = "Math study", uniWorkLabel = "Uni work", onSaveGoals }) => {
   const [selected, setSelected] = useState(workDays);
+  const [focusLabel, setFocusLabel] = useState(focusGoalLabel);
+  const [uniLabel, setUniLabel] = useState(uniWorkLabel);
 
   useEffect(() => {
     setSelected(workDays);
   }, [workDays, isOpen]);
+
+  useEffect(() => {
+    setFocusLabel(focusGoalLabel);
+    setUniLabel(uniWorkLabel);
+  }, [focusGoalLabel, uniWorkLabel, isOpen]);
 
   const toggleDay = (day) => {
     setSelected((prev) => (
@@ -17,6 +24,7 @@ const SettingsModal = ({ isOpen, onClose, workDays, onSaveWorkDays }) => {
 
   const handleSave = () => {
     onSaveWorkDays(selected.sort((a, b) => WEEKDAYS.indexOf(a) - WEEKDAYS.indexOf(b)));
+    if (onSaveGoals) onSaveGoals(focusLabel.trim() || "Math study", uniLabel.trim() || "Uni work");
     onClose();
   };
 
@@ -75,6 +83,46 @@ const SettingsModal = ({ isOpen, onClose, workDays, onSaveWorkDays }) => {
                 <span>{d}</span>
               </label>
             ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop: '16px' }}>
+          <div style={{ fontSize: '14px', color: '#93c5fd', marginBottom: '6px' }}>Goals</div>
+          <div style={{ display: 'grid', gap: '8px' }}>
+            <label style={{ display: 'grid', gap: '6px' }}>
+              <span style={{ fontSize: '12px', color: '#9ca3af' }}>Focus goal (when Uni work is done)</span>
+              <input 
+                type="text" 
+                value={focusLabel}
+                onChange={(e) => setFocusLabel(e.target.value)}
+                placeholder="e.g. Math study"
+                style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  border: '1px solid #334155',
+                  background: '#0b1220',
+                  color: '#e5e7eb',
+                  fontSize: '14px'
+                }}
+              />
+            </label>
+            <label style={{ display: 'grid', gap: '6px' }}>
+              <span style={{ fontSize: '12px', color: '#9ca3af' }}>University work label</span>
+              <input 
+                type="text" 
+                value={uniLabel}
+                onChange={(e) => setUniLabel(e.target.value)}
+                placeholder="e.g. Uni work"
+                style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  border: '1px solid #334155',
+                  background: '#0b1220',
+                  color: '#e5e7eb',
+                  fontSize: '14px'
+                }}
+              />
+            </label>
           </div>
         </div>
 

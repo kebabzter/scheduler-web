@@ -46,7 +46,7 @@ const addLectures = (blocks, lectures) => {
   lectures.forEach((lec) => blocks.push({ start: lec.start, end: lec.end, task: "Lecture" }));
 };
 
-const addLunch = (blocks, lectures, current, uniDone) => {
+const addLunch = (blocks, lectures, current, uniDone, focusGoalLabel, uniWorkLabel) => {
   let lunchAdded = false;
   let currentTime = current;
 
@@ -57,7 +57,7 @@ const addLunch = (blocks, lectures, current, uniDone) => {
       const lunchTime = { hour: 12, minute: 30 };
       if (timeToMinutes(currentTime) <= 12 * 60 + 30 && 12 * 60 + 30 < timeToMinutes(lec.start)) {
         if (timeToMinutes(lunchTime) - timeToMinutes(currentTime) >= 15) {
-          blocks.push({ start: currentTime, end: lunchTime, task: uniDone ? "Math study" : "Uni work" });
+          blocks.push({ start: currentTime, end: lunchTime, task: uniDone ? focusGoalLabel : uniWorkLabel });
         }
         blocks.push({ start: lunchTime, end: addMinutes(lunchTime, 30), task: "Lunch" });
         currentTime = addMinutes(lunchTime, 30);
@@ -66,7 +66,7 @@ const addLunch = (blocks, lectures, current, uniDone) => {
     }
     
     if (gapMinutes >= 60) {
-      blocks.push({ start: currentTime, end: lec.start, task: uniDone ? "Math study" : "Uni work" });
+      blocks.push({ start: currentTime, end: lec.start, task: uniDone ? focusGoalLabel : uniWorkLabel });
     }
     currentTime = lec.end;
   }
@@ -80,9 +80,9 @@ const addLunch = (blocks, lectures, current, uniDone) => {
   return currentTime;
 };
 
-const addWorkDaySchedule = (blocks, current) => {
+const addWorkDaySchedule = (blocks, current, focusGoalLabel) => {
   if (timeToMinutes(current) < 16 * 60 + 30) {
-    blocks.push({ start: current, end: { hour: 16, minute: 30 }, task: "Math study" });
+    blocks.push({ start: current, end: { hour: 16, minute: 30 }, task: focusGoalLabel });
   }
   
   blocks.push(
@@ -96,9 +96,9 @@ const addWorkDaySchedule = (blocks, current) => {
   );
 };
 
-const addNonWorkDaySchedule = (blocks, current, uniDone) => {
+const addNonWorkDaySchedule = (blocks, current, uniDone, focusGoalLabel, uniWorkLabel) => {
   blocks.push(
-    { start: current, end: { hour: 20, minute: 0 }, task: uniDone ? "Math study" : "Uni work" },
+    { start: current, end: { hour: 20, minute: 0 }, task: uniDone ? focusGoalLabel : uniWorkLabel },
     { start: { hour: 20, minute: 0 }, end: { hour: 20, minute: 10 }, task: "Shower" },
     { start: { hour: 20, minute: 10 }, end: { hour: 21, minute: 0 }, task: "Relax" },
     { start: { hour: 21, minute: 0 }, end: { hour: 21, minute: 30 }, task: "Dinner" },
@@ -108,10 +108,10 @@ const addNonWorkDaySchedule = (blocks, current, uniDone) => {
   );
 };
 
-const insertCleaningSunday = (blocks) => {
+const insertCleaningSunday = (blocks, focusGoalLabel, uniWorkLabel) => {
   const cutoff = { hour: 20, minute: 0 };
   const isBeforeCutoff = (t) => timeToMinutes(t) < timeToMinutes(cutoff);
-  const canUseTask = (task) => task === "Relax" || task === "Math study" || task === "Uni work";
+  const canUseTask = (task) => task === "Relax" || task === focusGoalLabel || task === uniWorkLabel;
 
   for (let i = 0; i < blocks.length; i++) {
     const b = blocks[i];
@@ -125,21 +125,25 @@ const insertCleaningSunday = (blocks) => {
       const cleaningEnd = addMinutes(cleaningStart, 60);
 
       const newBlocks = [];
-      // Prefix (none because we start at b.start)
       newBlocks.push({ start: cleaningStart, end: cleaningEnd, task: "Cleaning" });
-      // Suffix remainder of original block
       if (timeToMinutes(cleaningEnd) < timeToMinutes(b.end)) {
         newBlocks.push({ start: cleaningEnd, end: b.end, task: b.task });
       }
 
-      // Replace current block with new ones
       blocks.splice(i, 1, ...newBlocks);
-      return; // only insert once
+      return;
     }
   }
 };
 
-export const generateSchedule = (day, lectures, uniDone, workDays = ["Mon", "Tue", "Thu", "Fri"]) => {
+export const generateSchedule = (
+  day, 
+  lectures, 
+  uniDone, 
+  workDays = ["Mon", "Tue", "Thu", "Fri"],
+  focusGoalLabel = "Math study",
+  uniWorkLabel = "Uni work"
+) => {
   const WORK_DAYS = workDays;
   let blocks = [];
 
@@ -153,18 +157,18 @@ export const generateSchedule = (day, lectures, uniDone, workDays = ["Mon", "Tue
   addLectures(blocks, lectures);
 
   // Lunch and gaps
-  let current = addLunch(blocks, lectures, lastEnd, uniDone);
+  let current = addLunch(blocks, lectures, lastEnd, uniDone, focusGoalLabel, uniWorkLabel);
 
   // Fill remaining day
   if (WORK_DAYS.includes(day)) {
-    addWorkDaySchedule(blocks, current);
+    addWorkDaySchedule(blocks, current, focusGoalLabel);
   } else {
-    addNonWorkDaySchedule(blocks, current, uniDone);
+    addNonWorkDaySchedule(blocks, current, uniDone, focusGoalLabel, uniWorkLabel);
   }
 
   // Sunday cleaning: insert earliest 60-min window before 20:00
   if (day === "Sun") {
-    insertCleaningSunday(blocks);
+    insertCleaningSunday(blocks, focusGoalLabel, uniWorkLabel);
   }
 
   return mergeBlocks(blocks);
