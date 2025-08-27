@@ -34,7 +34,9 @@ const SettingsModal = ({ isOpen, onClose, workDays, onSaveWorkDays, focusGoalLab
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(0,0,0,0.6)',
+      background: 'rgba(0,0,0,0.35)',
+      backdropFilter: 'blur(6px)',
+      WebkitBackdropFilter: 'blur(6px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
