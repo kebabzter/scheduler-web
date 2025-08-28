@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { IntervalManager } from "./services/intervalManager";
 import { addMinutes } from "./services/timeUtils";
+import LectureManager from "./components/LectureManager";
+import ScheduleDisplay from "./components/ScheduleDisplay";
+import SettingsModal from "./components/SettingsModal";
+import "./Scheduler.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -347,230 +351,67 @@ const Scheduler = () => {
   };
 
   return (
-    <div style={{ 
-      fontFamily: "monospace", 
-      background: "#0b1220", 
-      color: "#e6edf3", 
-      padding: '12px',
-      borderRadius: 6,
-      textAlign: 'left',
-      maxWidth: '900px',
-      margin: '0 auto'
-    }}>
+    <div className="scheduler-container">
       {/* Top bar: Settings + Day nav */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
-        <button onClick={() => setSettingsOpen(true)}
-          aria-label="Open settings"
-          title="Settings"
-          style={{ padding: '10px 12px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', cursor: 'pointer', minWidth: 44, minHeight: 40, lineHeight: 1 }}>
+      <div className="top-bar">
+        <button onClick={() => setSettingsOpen(true)} aria-label="Open settings" title="Settings" className="btn" style={{ minWidth: 44, minHeight: 40, lineHeight: 1 }}>
           <span style={{ fontSize: '20px' }}>*</span>
         </button>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button onClick={() => changeDay(-1)} style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', cursor: 'pointer' }}>{"<<"}</button>
-            <div style={{ minWidth: 80, textAlign: 'center', fontWeight: 700 }}>{WEEKDAYS[currentDate.getDay()]}</div>
-            <button onClick={() => changeDay(1)} style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', cursor: 'pointer' }}>{">>"}</button>
+          <div className="nav-day">
+            <button onClick={() => changeDay(-1)} className="nav-day-btn">{"<<"}</button>
+            <div className="day-name">{WEEKDAYS[currentDate.getDay()]}</div>
+            <button onClick={() => changeDay(1)} className="nav-day-btn">{">>"}</button>
           </div>
-          <div style={{ fontSize: '11px', color: '#93a7c1', marginTop: '4px' }}>{formatDate(currentDate)}</div>
+          <div className="date-subtle">{formatDate(currentDate)}</div>
         </div>
         <div style={{ width: 44 }} />
       </div>
 
-      {/* Lectures (kept visible) */}
-      <div style={{ marginBottom: '16px' }}>
-        <h3 style={{ color: "#e6edf3", fontSize: '18px', marginBottom: '10px' }}>
-          Lectures
-        </h3>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div style={{ minWidth: 130 }}>
-            <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Start</label>
-            <input type="time" value={lectureStart} onChange={(e) => setLectureStart(e.target.value)}
-              style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3' }} />
-          </div>
-          <div style={{ minWidth: 130 }}>
-            <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>End</label>
-            <input type="time" value={lectureEnd} onChange={(e) => setLectureEnd(e.target.value)}
-              style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3' }} />
-          </div>
-          <button onClick={addLecture}
-            style={{ padding: '12px 16px', fontSize: '14px', fontWeight: '600', borderRadius: '6px', border: 'none', background: '#38bdf8', color: '#051524', cursor: 'pointer' }}>
-            Add Lecture
-          </button>
-        </div>
-        <div style={{ marginTop: '10px' }}>
-          {lectures.length === 0 ? (
-            <div style={{ color: '#93a7c1', fontStyle: 'italic' }}>No lectures added.</div>
-          ) : (
-            lectures.map((lec, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', border: '1px solid #1f2a44', borderRadius: '6px', background: '#0e1a2a', marginBottom: '6px' }}>
-                <div>
-                  {lec.start} - {lec.end}  Lecture
-                </div>
-                <button onClick={() => removeLecture(idx)}
-                  style={{ padding: '6px 10px', fontSize: '12px', borderRadius: '4px', border: '1px solid #1f2a44', background: '#f87171', color: '#051524', cursor: 'pointer' }}>
-                  Remove
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-        <div>
-                <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Goals</h4>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input type="checkbox" checked={uniWorkCompleted} onChange={(e) => setUniWorkCompleted(e.target.checked)} />
-                  <span>Uni work completed (week)</span>
-                </label>
-              </div>
-      </div>
+      {/* Lectures and Goals */}
+      <LectureManager
+        lectureStart={lectureStart}
+        lectureEnd={lectureEnd}
+        setLectureStart={setLectureStart}
+        setLectureEnd={setLectureEnd}
+        lectures={lectures}
+        addLecture={addLecture}
+        removeLecture={removeLecture}
+        uniWorkCompleted={uniWorkCompleted}
+        setUniWorkCompleted={setUniWorkCompleted}
+      />
 
-      <button 
-        onClick={generateSchedule}
-        style={{
-          padding: '12px 20px',
-          fontSize: '16px',
-          fontWeight: '600',
-          borderRadius: '6px',
-          border: 'none',
-          background: '#38bdf8',
-          color: '#051524',
-          cursor: 'pointer',
-          marginBottom: '16px',
-          width: '100%'
-        }}
-      >
-        Generate Schedule
-      </button>
+      <button onClick={generateSchedule} className="generate-btn">Generate Schedule</button>
 
-      <div>
-        <h3 style={{ color: "#e6edf3", fontSize: '18px', marginBottom: '10px' }}>
-          Schedule
-        </h3>
-        <div style={{ 
-          background: '#0a1626',
-          border: '1px solid #1f2a44',
-          borderRadius: '6px',
-          padding: '12px',
-          fontFamily: 'monospace',
-          fontSize: '14px',
-          lineHeight: '1.5',
-          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)'
-        }}>
-          <div style={{ color: '#7dd3fc', marginBottom: '8px', fontSize: '12px' }}>
-            [user@scheduler ~]$ cat {selectedDay.toLowerCase()}.txt
-          </div>
-          {computedBlocks.length === 0 ? (
-            <div style={{ color: '#93a7c1', fontStyle: 'italic' }}>
-              No schedule yet. Click "Generate Schedule".
-            </div>
-          ) : (
-            computedBlocks.map((b, i) => (
-              <div key={i} style={{ color: getTaskColor(b.task) }}>&gt; {formatHHMM(b.start)} - {formatHHMM(b.end)}  {b.task}</div>
-            ))
-          )}
-        </div>
-      </div>
+      <ScheduleDisplay
+        selectedDay={selectedDay}
+        blocks={computedBlocks}
+        formatHHMM={formatHHMM}
+        getTaskColor={getTaskColor}
+      />
 
       {/* Settings Modal */}
-      {settingsOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-          <div onClick={() => setSettingsOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(7, 12, 24, 0.6)', backdropFilter: 'blur(8px)' }} />
-          <div style={{ position: 'relative', width: '100%', maxWidth: '100%', background: '#0e1a2a', border: '1px solid #1f2a44', borderRadius: '10px', padding: '12px', zIndex: 60, boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto', overflowX: 'hidden' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h3 style={{ margin: 0, color: '#e6edf3' }}>Settings</h3>
-              <button onClick={() => setSettingsOpen(false)} style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', cursor: 'pointer' }}>Close</button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-              <div>
-                <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Sleep Time</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Sleep Start</label>
-                    <input type="time" value={sleepStart} onChange={(e) => setSleepStart(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', boxSizing: 'border-box' }} />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Sleep End</label>
-                    <input type="time" value={sleepEnd} onChange={(e) => setSleepEnd(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', boxSizing: 'border-box' }} />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Meals</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Breakfast (15m)</label>
-                    <input type="time" value={morningPref} onChange={(e) => setMorningPref(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', boxSizing: 'border-box' }} />
-                    <div style={{ marginTop: '4px', fontSize: '12px', color: '#93a7c1' }}>Morning routine runs 15m before</div>
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Lunch (30m, ±60m)</label>
-                    <input type="time" value={lunchPref} onChange={(e) => setLunchPref(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3' }} />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Dinner (30m)</label>
-                    <input type="time" value={dinnerPref} onChange={(e) => setDinnerPref(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3' }} />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Work Days</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: '8px' }}>
-                  {WEEKDAYS.map((d) => (
-                    <label key={d} style={{
-                      display: 'flex', alignItems: 'center', gap: '6px', padding: '8px',
-                      border: '1px solid #1f2a44', borderRadius: '6px', background: workDays.includes(d) ? '#0f2a44' : '#0b162a'
-                    }}>
-                      <input type="checkbox" checked={workDays.includes(d)} onChange={() => toggleWorkDay(d)} />
-                      <span>{d}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Meal Prep Days</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: '8px' }}>
-                  {WEEKDAYS.map((d) => (
-                    <label key={d} style={{
-                      display: 'flex', alignItems: 'center', gap: '6px', padding: '8px',
-                      border: '1px solid #1f2a44', borderRadius: '6px', background: mealPrepDays.includes(d) ? '#0f2a44' : '#0b162a'
-                    }}>
-                      <input type="checkbox" checked={mealPrepDays.includes(d)} onChange={() => toggleMealPrepDay(d)} />
-                      <span>{d}</span>
-                    </label>
-                  ))}
-                </div>
-                <div style={{ fontSize: '12px', color: '#93a7c1', marginTop: '6px' }}>
-                  Earliest available 2-hour window will be reserved on enabled days.
-                </div>
-              </div>
-
-              <div>
-                <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Cleaning Day (Weekend)</h4>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  {['', 'Sat', 'Sun'].map((opt) => (
-                    <label key={opt || 'none'} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <input type="radio" name="cleaningDay" value={opt} checked={cleaningDay === opt} onChange={(e) => setCleaningDay(e.target.value)} />
-                      <span>{opt === '' ? 'None' : opt}</span>
-                    </label>
-                  ))}
-                </div>
-                <div style={{ fontSize: '12px', color: '#93a7c1', marginTop: '6px' }}>
-                  1 hour for Cleaning will be reserved after the lunch break when possible.
-                </div>
-              </div>
-
-              
-            </div>
-          </div>
-        </div>
-      )}
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        sleepStart={sleepStart}
+        setSleepStart={setSleepStart}
+        sleepEnd={sleepEnd}
+        setSleepEnd={setSleepEnd}
+        morningPref={morningPref}
+        setMorningPref={setMorningPref}
+        lunchPref={lunchPref}
+        setLunchPref={setLunchPref}
+        dinnerPref={dinnerPref}
+        setDinnerPref={setDinnerPref}
+        WEEKDAYS={WEEKDAYS}
+        workDays={workDays}
+        toggleWorkDay={toggleWorkDay}
+        mealPrepDays={mealPrepDays}
+        toggleMealPrepDay={toggleMealPrepDay}
+        cleaningDay={cleaningDay}
+        setCleaningDay={setCleaningDay}
+      />
     </div>
   );
 };
