@@ -474,7 +474,7 @@ const Scheduler = () => {
       {settingsOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
           <div onClick={() => setSettingsOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(7, 12, 24, 0.6)', backdropFilter: 'blur(8px)' }} />
-          <div style={{ position: 'relative', width: '100%', maxWidth: '720px', background: '#0e1a2a', border: '1px solid #1f2a44', borderRadius: '10px', padding: '16px', zIndex: 60 }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '100%', background: '#0e1a2a', border: '1px solid #1f2a44', borderRadius: '10px', padding: '12px', zIndex: 60, boxSizing: 'border-box', maxHeight: '90vh', overflowY: 'auto', overflowX: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <h3 style={{ margin: 0, color: '#e6edf3' }}>Settings</h3>
               <button onClick={() => setSettingsOpen(false)} style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', cursor: 'pointer' }}>Close</button>
@@ -482,27 +482,27 @@ const Scheduler = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
               <div>
                 <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Sleep Time</h4>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                  <div style={{ minWidth: 160 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+                  <div>
                     <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Sleep Start</label>
                     <input type="time" value={sleepStart} onChange={(e) => setSleepStart(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3' }} />
+                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', boxSizing: 'border-box' }} />
                   </div>
-                  <div style={{ minWidth: 160 }}>
+                  <div>
                     <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Sleep End</label>
                     <input type="time" value={sleepEnd} onChange={(e) => setSleepEnd(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3' }} />
+                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', boxSizing: 'border-box' }} />
                   </div>
                 </div>
               </div>
 
               <div>
                 <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Meals</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(160px, 1fr))', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
                   <div>
                     <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px' }}>Breakfast (15m)</label>
                     <input type="time" value={morningPref} onChange={(e) => setMorningPref(e.target.value)}
-                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3' }} />
+                      style={{ padding: '10px 12px', width: '100%', fontSize: '14px', borderRadius: '6px', border: '1px solid #1f2a44', background: '#0f2036', color: '#e6edf3', boxSizing: 'border-box' }} />
                     <div style={{ marginTop: '4px', fontSize: '12px', color: '#93a7c1' }}>Morning routine runs 15m before</div>
                   </div>
                   <div>
@@ -520,7 +520,7 @@ const Scheduler = () => {
 
               <div>
                 <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Work Days</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: '8px' }}>
                   {WEEKDAYS.map((d) => (
                     <label key={d} style={{
                       display: 'flex', alignItems: 'center', gap: '6px', padding: '8px',
@@ -535,7 +535,7 @@ const Scheduler = () => {
 
               <div>
                 <h4 style={{ margin: '0 0 8px 0', color: '#e6edf3' }}>Meal Prep Days</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: '8px' }}>
                   {WEEKDAYS.map((d) => (
                     <label key={d} style={{
                       display: 'flex', alignItems: 'center', gap: '6px', padding: '8px',
